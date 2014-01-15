@@ -94,3 +94,7 @@ _vti_pvt/
 
 #Ignore private folder
 /Private/
+
+#Ingore database
+*.mdf
+*.ldf

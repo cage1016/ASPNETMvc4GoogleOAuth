@@ -53,6 +53,10 @@ namespace ASPNETMvc4GoogleOAuth.Controllers
         public ActionResult LogOff()
         {
             WebSecurity.Logout();
+            if (Session["googletoken"] != null)
+            {
+                Session.RemoveAll();
+            }
 
             return RedirectToAction("Index", "Home");
         }
@@ -217,10 +221,18 @@ namespace ASPNETMvc4GoogleOAuth.Controllers
         [AllowAnonymous]
         public ActionResult ExternalLoginCallback(string returnUrl)
         {
+            // Rewrite request before it gets passed on to the OAuth Web Security classes
+            GoogleClient.RewriteRequest();
+
             AuthenticationResult result = OAuthWebSecurity.VerifyAuthentication(Url.Action("ExternalLoginCallback", new { ReturnUrl = returnUrl }));
             if (!result.IsSuccessful)
             {
                 return RedirectToAction("ExternalLoginFailure");
+            }
+
+            if (result.ExtraData.Keys.Contains("accesstoken"))
+            {
+                Session["googletoken"] = result.ExtraData["accesstoken"];
             }
 
             if (OAuthWebSecurity.Login(result.Provider, result.ProviderUserId, createPersistentCookie: false))

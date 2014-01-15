@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.Web.WebPages.OAuth;
 using ASPNETMvc4GoogleOAuth.Models;
+using System.Configuration;
 
 namespace ASPNETMvc4GoogleOAuth
 {
@@ -27,6 +28,10 @@ namespace ASPNETMvc4GoogleOAuth
             //    appSecret: "");
 
             //OAuthWebSecurity.RegisterGoogleClient();
+            string clientId = ConfigurationManager.AppSettings["clientId"] as string;
+            string clientSecret = ConfigurationManager.AppSettings["clientSecret"] as string;
+
+            OAuthWebSecurity.RegisterClient(new GoogleClient(clientId, clientSecret), "Google", null);
         }
     }
 }
