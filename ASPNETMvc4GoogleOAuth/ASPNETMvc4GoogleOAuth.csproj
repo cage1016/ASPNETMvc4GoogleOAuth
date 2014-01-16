@@ -318,6 +318,14 @@
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
+    <Content Include="Scripts\js\add.html" />
+    <Content Include="Scripts\js\edit.html" />
+    <Content Include="Scripts\js\google-calendar-event.js" />
+    <Content Include="Scripts\js\list.html" />
+    <Content Include="Scripts\js\template\_edit.html" />
+    <Content Include="Scripts\js\vendor\angular-resource.min.js" />
+    <Content Include="Scripts\js\vendor\angular-route.min.js" />
+    <Content Include="Scripts\js\vendor\angular.min.js" />
     <Content Include="Scripts\knockout-2.2.0.debug.js" />
     <Content Include="Scripts\knockout-2.2.0.js" />
     <Content Include="Scripts\modernizr-2.6.2.js" />
@@ -360,6 +368,10 @@
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Web.config" />
+    <Content Include="Views\Event\Index.cshtml" />
+    <Content Include="Scripts\js\vendor\angular-resource.min.js.map" />
+    <Content Include="Scripts\js\vendor\angular-route.min.js.map" />
+    <Content Include="Scripts\js\vendor\angular.min.js.map" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
