@@ -1,0 +1,30 @@
+﻿<a href="#add">Add Event</a>
+
+<table style="width:100%">
+    <thead>
+        <tr>
+            <th></th>
+            <th>gid</th>
+            <th>summary</th>
+            <th>description</th>
+            <th>start</th>
+            <!--<th>start datetime</th>-->
+            <th>end</th>
+            <!--<th>end datetime</th>-->
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr data-ng-repeat="g in events">
+            <td><a ng-href="Event#/edit/{{g.guid}}">edit</a></td>
+            <td data-ng-bind="g.Id"></td>
+            <td data-ng-bind="g.summary"></td>
+            <td data-ng-bind="g.description"></td>
+            <td data-ng-bind="g.start"></td>
+            <!--<td data-ng-bind="g.startDatetime"></td>-->
+            <td data-ng-bind="g.end"></td>
+            <!--<td data-ng-bind="g.endDatetime"></td>-->
+            <td><a href="" ng-click="delete(g)">delete</a></td>
+        </tr>
+    </tbody>
+</table>
