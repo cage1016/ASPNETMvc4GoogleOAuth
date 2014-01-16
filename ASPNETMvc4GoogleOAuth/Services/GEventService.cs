@@ -14,12 +14,14 @@ namespace ASPNETMvc4GoogleOAuth.Services
 {
     public interface IGEventService
     {
+        IQueryable<GEvent> FindAll();
+
         IEnumerable<GEvent> GetAll();
         IEnumerable<CalendarListEntry> GetAllGoogleCalendar(string token);
 
-        bool Insert(string calendarId, string requestBody);
-        bool Update(GEvent gEvent);
-        bool Delete(Guid guid);
+        GEvent Insert(string token, string calendarId, string requestBody);
+        GEvent Update(string token, string guid, string calendarId, string id, string requestBody);
+        bool Delete(string token, string guid, string calendarId, string id);
     }
 
     public class GEventService : IGEventService
@@ -39,24 +41,32 @@ namespace ASPNETMvc4GoogleOAuth.Services
             //base.Dispose(disposing);
         }
 
+        public IQueryable<GEvent> FindAll()
+        {
+            return db.GEvents;
+        }
+
         public IEnumerable<GEvent> GetAll()
         {
             return db.GEvents.ToList();
         }
 
-        private Event CreateGoogleEvent(string token, string calendarId, string requestBody)
+        private Event GoogleEventHandle(string token, string method, string requestURL, string requestBody = null)
         {
             var jsonSerializer = new JavaScriptSerializer();
-            var request = WebRequest.Create("https://www.googleapis.com/calendar/v3/calendars/" + calendarId + "/events") as HttpWebRequest;
+            var request = WebRequest.Create(requestURL) as HttpWebRequest;
             request.KeepAlive = true;
             request.ContentType = "application/json";
-            request.Method = "POST";
+            request.Method = method;
             request.Headers.Add("Authorization", "Bearer " + token);
 
-            Stream ws = request.GetRequestStream();
-            using (var streamWriter = new StreamWriter(ws, new UTF8Encoding(false)))
+            if(requestBody != null)
             {
-                streamWriter.Write(requestBody);
+                Stream ws = request.GetRequestStream();
+                using (var streamWriter = new StreamWriter(ws, new UTF8Encoding(false)))
+                {
+                    streamWriter.Write(requestBody);
+                }
             }
 
             var response = request.GetResponse();
@@ -64,7 +74,24 @@ namespace ASPNETMvc4GoogleOAuth.Services
 
             var googleEvent = Newtonsoft.Json.JsonConvert.DeserializeObject<Event>(stream.ReadToEnd().Trim());
 
-            return googleEvent;
+            return googleEvent;  
+        }
+
+        private Event CreateGoogleEvent(string token, string calendarId, string requestBody)
+        {
+            var requestURL = string.Format("https://www.googleapis.com/calendar/v3/calendars/{0}/events", calendarId);
+            return GoogleEventHandle(token, "POST", requestURL, requestBody);              
+        }
+
+        private Event UpdateGoogleEvent(string token, string guid, string calendarId, string id, string requestBody)
+        {
+            var requestURL = string.Format("https://www.googleapis.com/calendar/v3/calendars/{0}/events/{1}", calendarId, id);
+            return GoogleEventHandle(token, "PUT", requestURL, requestBody);
+        }
+
+        private Event DeleteGoogleEvent(string token, string calendarId, string id ) {
+            var requestURL = string.Format("https://www.googleapis.com/calendar/v3/calendars/{0}/events/{1}", calendarId, id);
+            return GoogleEventHandle(token, "DELETE", requestURL);
         }
 
         public IEnumerable<CalendarListEntry> GetAllGoogleCalendar(string token)
@@ -91,38 +118,68 @@ namespace ASPNETMvc4GoogleOAuth.Services
             }            
         }
 
-        public bool Insert(string calendarId, string requestBody)
+        public GEvent Insert(string token, string calendarId, string requestBody)
         {
-            throw new NotImplementedException();
+            var e = CreateGoogleEvent(token, calendarId, requestBody);
+
+            GEvent newGevent = new GEvent
+            {
+                guid = Guid.NewGuid(),
+                calendarId = calendarId,
+                Id = e.Id,
+                summary = e.Summary,
+                description = e.Description,
+                start = e.Start.Date,
+                startDateTime = e.Start.DateTime,
+                end = e.End.Date,
+                endDateTime = e.End.DateTime
+            };
+
+            db.GEvents.Add(newGevent);
+            db.SaveChanges();
+
+            return newGevent;
         }
 
-        public bool Update(GEvent gEvent)
+        public GEvent Update(string token, string guid, string calendarId, string id, string requestBody)
         {
-            var dGEvent = db.GEvents.Where(x => x.guid == gEvent.guid).SingleOrDefault();
+            // 1. update google calendar event via API
+            var e = UpdateGoogleEvent(token, guid, calendarId, id, requestBody);
+
+            Guid _guid;
+            Guid.TryParse(guid, out _guid);
+
+            var dGEvent = db.GEvents.Where(x => x.guid == _guid).SingleOrDefault();
             if (dGEvent != null)
             {
-                dGEvent.summary = gEvent.summary;
-                dGEvent.description = gEvent.description;
-                dGEvent.start = gEvent.start;
-                dGEvent.startDateTime = gEvent.startDateTime;
-                dGEvent.end = gEvent.end;
-                dGEvent.endDateTime = gEvent.endDateTime;
+                dGEvent.summary = e.Summary;
+                dGEvent.description = e.Description;
+                dGEvent.start = e.Start.Date;
+                dGEvent.startDateTime = e.Start.DateTime;
+                dGEvent.end = e.End.Date;
+                dGEvent.endDateTime = e.End.DateTime;
                     
                 db.SaveChanges();
             }
 
-            return true;
+            return dGEvent;
         }
 
-        public bool Delete(Guid guid)
+        public bool Delete(string token, string guid, string calendarId, string id)
         {
-            var dGEvent = db.GEvents.Where(x => x.guid == guid).SingleOrDefault();
-            if (dGEvent != null)
-            {
-                db.GEvents.Remove(dGEvent);
-                db.SaveChanges();
-            }
+            var e = DeleteGoogleEvent(token, calendarId, id);
 
+            if (e == null)
+            {
+                Guid _guid;
+                Guid.TryParse(guid, out _guid);
+                var dGEvent = db.GEvents.Where(x => x.guid == _guid).SingleOrDefault();
+                if (dGEvent != null)
+                {
+                    db.GEvents.Remove(dGEvent);
+                    db.SaveChanges();
+                }
+            }
             return true;
         }
     }
