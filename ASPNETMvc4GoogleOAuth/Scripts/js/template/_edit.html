@@ -1,0 +1,45 @@
+﻿<div style="margin-top:30px;">
+    <section class="new-calendar">
+
+        <!-- heaer -->
+        {{event}}
+        <div data-ng-if="!event.id">
+            <header>Create new Event</header>
+            <p>
+                <span class="label">calendar id</span>
+                <span ng-bind="event.calendarId"></span>
+            </p>
+        </div>
+
+        <div data-ng-if="event.id">
+            <header>Update Event</header>
+            <p>
+                <span class="label">event id</span>
+                <span ng-bind="event.requestBody.Id"></span>
+            </p>
+        </div>
+
+        <!-- same part -->
+        <p>
+            <span class="label">summary</span>
+            <input type="text" ng-model="event.requestBody.summary" />
+        </p>
+        <p>
+            <span class="label">description</span>
+            <input type="text" ng-model="event.requestBody.description" />
+        </p>
+        <p>
+            <span class="label">start</span>
+            <input type="text" ng-model="event.requestBody.start.date" />
+        </p>
+        <p>
+            <span class="label">end</span>
+            <input type="text" ng-model="event.requestBody.end.date" />
+        </p>
+
+        <!-- footer part -->        
+        <button ng-if="!event.id" ng-disabled="!event.calendarId" ng-click="create(event)">Create</button>
+        <button ng-if="event.id" ng-click="update(event)">Update</button>
+
+    </section>
+</div>

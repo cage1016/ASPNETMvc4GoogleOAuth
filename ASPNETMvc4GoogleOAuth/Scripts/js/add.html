@@ -1,0 +1,25 @@
+﻿<a href="/Event">back</a>
+
+<div>Google Calendar list</div>
+
+<table>
+    <thead>
+        <tr>
+            <td></td>
+            <th>Calendar ID</th>
+            <th>Summary</th>
+            <th>TimeZone</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="g in calendars" ng-class="{'selected':g.selected}">
+            <td>
+                <input type="checkbox" data-ng-model="g.selected" ng-click="setSelect(!g.selected?g.Id:'')" /></td>
+            <td ng-bind="g.Id"></td>
+            <td ng-bind="g.Summary"></td>
+            <td ng-bind="g.TimeZone"></td>
+        </tr>
+    </tbody>
+</table>
+
+<div ng-include="template"></div>

@@ -1,0 +1,26 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+
+@section scripts {
+
+    <style type="text/css">
+        .selected {
+            background-color: #FFc;
+        }
+
+        .new-calendar p {
+            margin: 5px 0 0 10px;
+        }
+    </style>
+
+
+    <script src="http://momentjs.com/downloads/moment.min.js"></script>
+    <script src="~/Scripts/js/vendor/angular.min.js"></script>
+    <script src="~/Scripts/js/vendor/angular-route.min.js"></script>
+    <script src="~/Scripts/js/vendor/angular-resource.min.js"></script>
+
+    <script src="~/Scripts/js/google-calendar-event.js"></script>
+}
+
+<div ng-view></div>
